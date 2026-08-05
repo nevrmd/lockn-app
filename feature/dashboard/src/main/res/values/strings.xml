@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_habit">Add Habit</string>
+    <string name="delete_habit_title">Delete Habit?</string>
+    <string name="delete_habit_message">Are you sure you want to delete this habit? All progress history will be permanently removed.</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="select_date">Select Date</string>
+    <string name="previous_week">Previous Week</string>
+    <string name="next_week">Next Week</string>
+    <string name="increment">Increment</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="no_habits_for_date">No habits for this date.\nTap \'+\' to create one!</string>
+</resources>

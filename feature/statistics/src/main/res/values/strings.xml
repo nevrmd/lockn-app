@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="statistics_title">Statistics</string>
+    <string name="current_week">Current Week</string>
+    <string name="monthly_progress">Monthly Progress</string>
+    <string name="previous_month">Previous Month</string>
+    <string name="next_month">Next Month</string>
+    <string name="no_data_for_month">No data for this month</string>
+    <string name="create_habits_to_see_stats">Create some habits to see statistics!</string>
+</resources>
