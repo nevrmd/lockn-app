@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.nevrmd.domain.model.Habit
 import com.nevrmd.domain.model.HabitWithCompletions
+import com.nevrmd.domain.usecase.DeleteHabitUseCase
 import com.nevrmd.domain.usecase.GetHabitsForDateRangeUseCase
 import com.nevrmd.domain.usecase.SaveIncrementHabitCompletionUseCase
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
@@ -25,6 +26,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -37,6 +39,7 @@ class DashboardViewModelTest {
     private lateinit var viewModel: DashboardViewModel
     private lateinit var getHabitsForDateRangeUseCase: GetHabitsForDateRangeUseCase
     private lateinit var saveIncrementHabitCompletionUseCase: SaveIncrementHabitCompletionUseCase
+    private lateinit var deleteHabitUseCase: DeleteHabitUseCase
     
     private val clock = object : Clock {
         override fun now(): Instant = Instant.parse("2024-01-01T00:00:00Z")
@@ -48,6 +51,7 @@ class DashboardViewModelTest {
         Dispatchers.setMain(testDispatcher)
         getHabitsForDateRangeUseCase = mockk()
         saveIncrementHabitCompletionUseCase = mockk()
+        deleteHabitUseCase = mockk()
         
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(emptyList())
     }
@@ -59,7 +63,7 @@ class DashboardViewModelTest {
 
     @Test
     fun `when OnDateSelected is emitted, uiState is updated with new date`() = runTest {
-        val initialDate = "2024-01-01"
+        val initialDate = LocalDate.parse("2024-01-01")
         val newDate = "2024-01-02"
         
         val habits = listOf(
@@ -74,6 +78,7 @@ class DashboardViewModelTest {
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
             saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
             testDispatcher,
             clock,
             timeZone
@@ -84,7 +89,7 @@ class DashboardViewModelTest {
             val firstSuccess = if (firstItem is DashboardUiState.Loading) awaitItem() else firstItem
             
             assertThat(firstSuccess).isInstanceOf(DashboardUiState.Success::class.java)
-            assertThat((firstSuccess as DashboardUiState.Success).selectedDateString).isEqualTo(initialDate)
+            assertThat((firstSuccess as DashboardUiState.Success).selectedDateString).isEqualTo(initialDate.toString())
 
             viewModel.onEvent(DashboardUiEvent.OnDateSelected(newDate))
 
@@ -99,13 +104,14 @@ class DashboardViewModelTest {
     fun `when OnIncrementHabit is emitted, saveIncrementHabitCompletionUseCase is executed exactly once`() = runTest {
         val habitId = "1"
         val incrementBy = 1
-        val date = "2024-01-01"
+        val date = clock.todayIn(timeZone)
 
         coEvery { saveIncrementHabitCompletionUseCase(any(), any(), any()) } just Runs
 
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
             saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
             testDispatcher,
             clock,
             timeZone
@@ -127,13 +133,13 @@ class DashboardViewModelTest {
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
             saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
             testDispatcher,
             clock,
             timeZone
         )
 
         viewModel.uiState.test {
-            // Initial state
             awaitItem() 
 
             viewModel.onEvent(DashboardUiEvent.OnNextWeekClicked)
@@ -149,13 +155,13 @@ class DashboardViewModelTest {
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
             saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
             testDispatcher,
             clock,
             timeZone
         )
 
         viewModel.uiState.test {
-            // Initial state
             awaitItem()
 
             viewModel.onEvent(DashboardUiEvent.OnPreviousWeekClicked)
@@ -168,8 +174,8 @@ class DashboardViewModelTest {
 
     @Test
     fun `when habit created in future, it is filtered out from current selected date`() = runTest {
-        val today = "2024-01-01"
-        val tomorrow = "2024-01-02"
+        val today = LocalDate.parse("2024-01-01")
+        val tomorrow = LocalDate.parse("2024-01-02")
         
         val habits = listOf(
             HabitWithCompletions(
@@ -183,21 +189,44 @@ class DashboardViewModelTest {
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
             saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
             testDispatcher,
             clock,
             timeZone
         )
 
         viewModel.uiState.test {
-            val state = awaitItem() // Will be Success if empty filtered list, or Empty state
+            val state = awaitItem()
             
             if (state is DashboardUiState.Empty) {
-                assertThat(state.selectedDateString).isEqualTo(today)
+                assertThat(state.selectedDateString).isEqualTo(today.toString())
             } else if (state is DashboardUiState.Success) {
                 assertThat(state.habits).isEmpty()
             }
             
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when OnDeleteHabit is emitted, deleteHabitUseCase is executed exactly once`() = runTest {
+        val habitId = "1"
+
+        coEvery { deleteHabitUseCase(any()) } just Runs
+
+        viewModel = DashboardViewModel(
+            getHabitsForDateRangeUseCase,
+            saveIncrementHabitCompletionUseCase,
+            deleteHabitUseCase,
+            testDispatcher,
+            clock,
+            timeZone
+        )
+
+        viewModel.onEvent(DashboardUiEvent.OnDeleteHabit(habitId))
+
+        coVerify(exactly = 1) {
+            deleteHabitUseCase(habitId)
         }
     }
 }

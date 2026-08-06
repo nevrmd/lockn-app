@@ -26,6 +26,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import org.junit.After
 import org.junit.Before
@@ -131,7 +132,7 @@ class HabitEditorViewModelTest {
             name = "Run",
             metricNoun = "km",
             targetAmount = 5,
-            createdAtDate = "2023-01-01"
+            createdAtDate = LocalDate.parse("2023-01-01")
         )
 
         coEvery { getHabitByIdUseCase(habitId) } returns existingHabit

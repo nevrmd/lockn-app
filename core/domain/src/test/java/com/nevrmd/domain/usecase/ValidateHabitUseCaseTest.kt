@@ -25,7 +25,7 @@ class ValidateHabitUseCaseTest {
         assertThat(result.isValid).isTrue()
     }
 
-    @Test // TODO: temp until ui emoji choosing is made
+    @Test
     fun `when emoji is not a single glyph, returns NotSingleEmoji error`() {
         val result = validateHabitUseCase(
             emoji = "🚀🚀",

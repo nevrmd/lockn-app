@@ -1,8 +1,11 @@
 package com.nevrmd.data.mapper
 
 import com.google.common.truth.Truth.assertThat
+import com.nevrmd.data.local.entity.HabitCompletionEntity
 import com.nevrmd.data.local.entity.HabitEntity
 import com.nevrmd.domain.model.Habit
+import com.nevrmd.domain.model.HabitCompletion
+import kotlinx.datetime.LocalDate
 import org.junit.Test
 
 class DataMappersTest {
@@ -25,7 +28,7 @@ class DataMappersTest {
         assertThat(domain.name).isEqualTo(entity.name)
         assertThat(domain.metricNoun).isEqualTo(entity.metricNoun)
         assertThat(domain.targetAmount).isEqualTo(entity.targetAmount)
-        assertThat(domain.createdAtDate).isEqualTo(entity.createdAtDateString)
+        assertThat(domain.createdAtDate.toString()).isEqualTo(entity.createdAtDateString)
     }
 
     @Test
@@ -36,7 +39,7 @@ class DataMappersTest {
             name = "Exercise",
             metricNoun = "minutes",
             targetAmount = 30,
-            createdAtDate = "2024-01-01"
+            createdAtDate = LocalDate.parse("2024-01-01")
         )
 
         val entity = domain.toEntity()
@@ -46,6 +49,36 @@ class DataMappersTest {
         assertThat(entity.name).isEqualTo(domain.name)
         assertThat(entity.metricNoun).isEqualTo(domain.metricNoun)
         assertThat(entity.targetAmount).isEqualTo(domain.targetAmount)
-        assertThat(entity.createdAtDateString).isEqualTo(domain.createdAtDate)
+        assertThat(entity.createdAtDateString).isEqualTo(domain.createdAtDate.toString())
+    }
+
+    @Test
+    fun `HabitCompletionEntity toDomain maps all fields correctly`() {
+        val entity = HabitCompletionEntity(
+            habitId = "1",
+            amountCompleted = 10,
+            dateCompleted = "2024-01-01"
+        )
+
+        val domain = entity.toDomain()
+
+        assertThat(domain.habitId).isEqualTo(entity.habitId)
+        assertThat(domain.amountCompleted).isEqualTo(entity.amountCompleted)
+        assertThat(domain.dateCompleted.toString()).isEqualTo(entity.dateCompleted)
+    }
+
+    @Test
+    fun `HabitCompletion toEntity maps all fields correctly`() {
+        val domain = HabitCompletion(
+            habitId = "1",
+            amountCompleted = 10,
+            dateCompleted = LocalDate.parse("2024-01-01")
+        )
+
+        val entity = domain.toEntity()
+
+        assertThat(entity.habitId).isEqualTo(domain.habitId)
+        assertThat(entity.amountCompleted).isEqualTo(domain.amountCompleted)
+        assertThat(entity.dateCompleted).isEqualTo(domain.dateCompleted.toString())
     }
 }
