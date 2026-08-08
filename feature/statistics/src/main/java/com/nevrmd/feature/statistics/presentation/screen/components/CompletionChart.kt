@@ -25,9 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.theme.LocknAlpha
+import com.nevrmd.core.ui.util.fullDisplayName
+import com.nevrmd.core.ui.util.shortDisplayName
 import com.nevrmd.domain.model.DailyStat
 import com.nevrmd.feature.statistics.R
 import kotlinx.collections.immutable.PersistentList
@@ -41,7 +46,7 @@ fun CompletionChart(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = LocknAlpha.SURFACE_VARIANT_CONTAINER)
         )
     ) {
         Column(
@@ -55,7 +60,7 @@ fun CompletionChart(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Start
             )
-            
+
             Spacer(modifier = Modifier.height(32.dp))
 
             Row(
@@ -87,8 +92,15 @@ private fun BarItem(
         label = "BarProgress"
     )
 
+    val barDescription = stringResource(
+        R.string.chart_bar_content_description,
+        stat.date.dayOfWeek.fullDisplayName(),
+        stat.completedAmount,
+        stat.targetAmount
+    )
+
     Column(
-        modifier = modifier,
+        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = barDescription },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Bottom
     ) {
@@ -114,11 +126,11 @@ private fun BarItem(
                     )
             )
         }
-        
+
         Spacer(modifier = Modifier.height(12.dp))
-        
+
         Text(
-            text = stat.dayName,
+            text = stat.date.dayOfWeek.shortDisplayName(),
             style = MaterialTheme.typography.labelSmall,
             color = if (stat.isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = if (stat.isToday) FontWeight.Bold else FontWeight.Normal

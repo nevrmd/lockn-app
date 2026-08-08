@@ -44,7 +44,7 @@ fun TargetAmountSelector(
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -82,7 +82,7 @@ fun TargetAmountSelector(
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.increase))
             }
         }
-        
+
         Text(
             text = metricNoun.ifBlank { stringResource(R.string.units) },
             style = MaterialTheme.typography.bodyMedium,

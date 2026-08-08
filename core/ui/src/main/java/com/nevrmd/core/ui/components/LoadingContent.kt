@@ -1,4 +1,4 @@
-package com.nevrmd.feature.dashboard.presentation.screen.components
+package com.nevrmd.core.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

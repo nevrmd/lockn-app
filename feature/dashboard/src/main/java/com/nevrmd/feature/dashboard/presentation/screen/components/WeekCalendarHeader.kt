@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.theme.LocknAlpha
 import com.nevrmd.feature.dashboard.R
 import com.nevrmd.feature.dashboard.domain.model.DayUiModel
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
@@ -38,7 +39,7 @@ fun WeekCalendarHeader(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = LocknAlpha.PRIMARY_CONTAINER_ICON))
             .padding(16.dp)
     ) {
         Row(

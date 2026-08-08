@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.theme.LocknAlpha
 
 @Composable
 fun GlassyTextField(
@@ -40,7 +41,9 @@ fun GlassyTextField(
             enabled = enabled,
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                    alpha = LocknAlpha.SURFACE_VARIANT_CONTAINER
+                ),
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                 unfocusedBorderColor = Color.Transparent,
             )

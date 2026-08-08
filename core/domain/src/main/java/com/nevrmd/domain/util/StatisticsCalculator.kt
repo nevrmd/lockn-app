@@ -3,7 +3,10 @@ package com.nevrmd.domain.util
 import com.nevrmd.domain.model.DailyStat
 import com.nevrmd.domain.model.HabitWithCompletions
 import com.nevrmd.domain.model.MonthlyStat
-import kotlinx.datetime.*
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
 import javax.inject.Inject
 
 class StatisticsCalculator @Inject constructor() {
@@ -16,9 +19,9 @@ class StatisticsCalculator @Inject constructor() {
         return (0..6).map { i ->
             val date = monday.plus(DatePeriod(days = i))
             val completion = habitWithCompletions?.completions?.find { it.dateCompleted == date }
-            
+
             DailyStat(
-                dayName = date.dayOfWeek.name.take(3).lowercase().replaceFirstChar { it.uppercase() },
+                date = date,
                 completedAmount = completion?.amountCompleted ?: 0,
                 targetAmount = habitWithCompletions?.habit?.targetAmount ?: 0,
                 isToday = date == today
@@ -31,24 +34,25 @@ class StatisticsCalculator @Inject constructor() {
         monthStart: LocalDate
     ): MonthlyStat? {
         val habit = habitWithCompletions?.habit ?: return null
-        val completions = habitWithCompletions.completions ?: emptyList()
+        val completions = habitWithCompletions.completions
 
         val totalCompleted = completions.sumOf { it.amountCompleted }
-        
+
         val monthEnd = monthStart.plus(DatePeriod(months = 1)).minus(DatePeriod(days = 1))
-        
+
         val habitCreatedDate = habit.createdAtDate
         val effectiveStart = if (habitCreatedDate > monthStart) habitCreatedDate else monthStart
-        
-        val effectiveDays = if (effectiveStart > monthEnd) 0 else {
-             (monthEnd.toEpochDays() - effectiveStart.toEpochDays() + 1).coerceAtLeast(0)
+
+        val effectiveDays = if (effectiveStart > monthEnd) {
+            0
+        } else {
+            (monthEnd.toEpochDays() - effectiveStart.toEpochDays() + 1).coerceAtLeast(0)
         }
 
         return MonthlyStat(
-            monthName = monthStart.month.name.lowercase().replaceFirstChar { it.uppercase() },
-            year = monthStart.year,
+            monthStart = monthStart,
             totalCompleted = totalCompleted,
-            totalTarget = (habit.targetAmount * effectiveDays).toInt(),
+            totalTarget = habit.targetAmount * effectiveDays,
             metricNoun = habit.metricNoun
         )
     }

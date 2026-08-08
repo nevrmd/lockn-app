@@ -18,6 +18,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nevrmd.core.ui.theme.LocknAlpha
+import com.nevrmd.core.ui.util.shortDisplayName
 import com.nevrmd.feature.dashboard.domain.model.DayUiModel
 import kotlinx.datetime.LocalDate
 
@@ -29,13 +31,13 @@ fun DayCard(
     modifier: Modifier = Modifier
 ) {
     val date = LocalDate.parse(dayModel.dateString)
-    val dayName = date.dayOfWeek.name.take(3)
+    val dayName = date.dayOfWeek.shortDisplayName()
     val dayNumber = date.dayOfMonth.toString()
 
     val backgroundColor = if (isSelected) {
         MaterialTheme.colorScheme.primary
     } else {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = LocknAlpha.SURFACE_VARIANT_CONTAINER)
     }
     val contentColor = if (isSelected) {
         MaterialTheme.colorScheme.onPrimary

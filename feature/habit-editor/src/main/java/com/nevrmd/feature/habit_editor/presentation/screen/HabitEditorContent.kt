@@ -28,12 +28,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.components.GlassyBackgroundGlows
 import com.nevrmd.feature.habit_editor.R
 import com.nevrmd.feature.habit_editor.presentation.event.HabitEditorUiEvent
 import com.nevrmd.feature.habit_editor.presentation.mapper.asString
+import com.nevrmd.feature.habit_editor.presentation.screen.components.DEFAULT_HABIT_EMOJI
 import com.nevrmd.feature.habit_editor.presentation.screen.components.EmojiPickerSelector
 import com.nevrmd.feature.habit_editor.presentation.screen.components.GlassyTextField
-import com.nevrmd.feature.habit_editor.presentation.screen.components.HabitEditorBackgroundGlows
 import com.nevrmd.feature.habit_editor.presentation.screen.components.TargetAmountSelector
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorMode
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
@@ -52,7 +53,13 @@ fun HabitEditorContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (uiState.mode == HabitEditorMode.Create) stringResource(R.string.new_habit) else stringResource(R.string.edit_habit),
+                        text = if (uiState.mode == HabitEditorMode.Create) {
+                            stringResource(
+                                R.string.new_habit
+                            )
+                        } else {
+                            stringResource(R.string.edit_habit)
+                        },
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -72,7 +79,14 @@ fun HabitEditorContent(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            HabitEditorBackgroundGlows()
+            GlassyBackgroundGlows(
+                primaryAlignment = Alignment.TopStart,
+                secondaryAlignment = Alignment.BottomEnd,
+                primaryOffset = Pair(-100, -50),
+                secondaryOffset = Pair(150, 100),
+                primaryAlpha = 0.15f,
+                secondaryAlpha = 0.15f
+            )
 
             Column(
                 modifier = Modifier
@@ -82,7 +96,7 @@ fun HabitEditorContent(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 EmojiPickerSelector(
-                    selectedEmoji = uiState.emoji.ifBlank { "📝" },
+                    selectedEmoji = uiState.emoji.ifBlank { DEFAULT_HABIT_EMOJI },
                     onEmojiSelected = { onEvent(HabitEditorUiEvent.OnEmojiChanged(it)) },
                     error = uiState.emojiError?.asString()
                 )

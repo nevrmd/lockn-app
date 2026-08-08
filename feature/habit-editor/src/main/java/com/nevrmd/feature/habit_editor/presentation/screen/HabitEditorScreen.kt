@@ -1,17 +1,12 @@
 package com.nevrmd.feature.habit_editor.presentation.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.nevrmd.core.ui.components.ErrorContent
+import com.nevrmd.core.ui.components.LoadingContent
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
 import com.nevrmd.feature.habit_editor.presentation.viewmodel.HabitEditorEffect
 import com.nevrmd.feature.habit_editor.presentation.viewmodel.HabitEditorViewModel
@@ -34,9 +29,7 @@ fun HabitEditorScreen(
 
     when (val state = uiState) {
         is HabitEditorUiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            LoadingContent()
         }
         is HabitEditorUiState.Success -> {
             HabitEditorContent(
@@ -46,9 +39,7 @@ fun HabitEditorScreen(
             )
         }
         is HabitEditorUiState.Error -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Error: ${state.message}", color = MaterialTheme.colorScheme.error)
-            }
+            ErrorContent(message = state.message)
         }
     }
 }

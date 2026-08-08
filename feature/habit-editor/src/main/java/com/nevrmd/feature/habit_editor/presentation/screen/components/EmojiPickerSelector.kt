@@ -30,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.nevrmd.core.ui.theme.LocknAlpha
+
+const val DEFAULT_HABIT_EMOJI = "📝"
 
 @Composable
 fun EmojiPickerSelector(
@@ -41,14 +44,14 @@ fun EmojiPickerSelector(
     val transitionState = remember {
         MutableTransitionState(false)
     }
-    val emojiList = listOf("📝", "💧", "🏃", "🥗", "📚", "🧘", "😴", "🎸", "🌱", "💊", "🍎", "🔥")
+    val emojiList = listOf(DEFAULT_HABIT_EMOJI, "💧", "🏃", "🥗", "📚", "🧘", "😴", "🎸", "🌱", "💊", "🍎", "🔥")
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = LocknAlpha.PRIMARY_CONTAINER_ICON))
                 .clickable { transitionState.targetState = true },
             contentAlignment = Alignment.Center
         ) {

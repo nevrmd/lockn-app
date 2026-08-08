@@ -5,7 +5,7 @@ import kotlinx.datetime.LocalDate
 
 sealed interface HabitEditorUiState {
     data object Loading : HabitEditorUiState
-    
+
     data class Success(
         val mode: HabitEditorMode,
         val habitId: String? = null,

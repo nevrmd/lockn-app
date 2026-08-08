@@ -33,7 +33,7 @@ class StatisticsViewModelTest {
     private lateinit var viewModel: StatisticsViewModel
     private lateinit var getHabitsForDateRangeUseCase: GetHabitsForDateRangeUseCase
     private lateinit var statisticsCalculator: StatisticsCalculator
-    
+
     private val clock = object : Clock {
         override fun now(): Instant = Instant.parse("2024-01-01T00:00:00Z")
     }
@@ -44,7 +44,7 @@ class StatisticsViewModelTest {
         Dispatchers.setMain(testDispatcher)
         getHabitsForDateRangeUseCase = mockk()
         statisticsCalculator = StatisticsCalculator()
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(emptyList())
     }
 
@@ -55,9 +55,17 @@ class StatisticsViewModelTest {
 
     @Test
     fun `when habits are fetched, uiState reflects success with habit list`() = runTest {
-        val habit = Habit(id = "1", emoji = "🚀", name = "Test", metricNoun = "times", targetAmount = 5, createdAtDate = LocalDate.parse("2024-01-01"))
+        val habit =
+            Habit(
+                id = "1",
+                emoji = "🚀",
+                name = "Test",
+                metricNoun = "times",
+                targetAmount = 5,
+                createdAtDate = LocalDate.parse("2024-01-01")
+            )
         val habits = listOf(HabitWithCompletions(habit = habit, completions = emptyList()))
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(habits)
 
         viewModel = StatisticsViewModel(
@@ -71,26 +79,42 @@ class StatisticsViewModelTest {
         viewModel.uiState.test {
             val firstItem = awaitItem()
             val firstSuccess = if (firstItem is StatisticsUiState.Loading) awaitItem() else firstItem
-            
+
             assertThat(firstSuccess).isInstanceOf(StatisticsUiState.Success::class.java)
             val state = firstSuccess as StatisticsUiState.Success
             assertThat(state.habits).hasSize(1)
             assertThat(state.habits[0].id).isEqualTo("1")
             assertThat(state.selectedHabitId).isEqualTo("1")
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `when OnHabitSelected is emitted, uiState is updated with new selected habit`() = runTest {
-        val habit1 = Habit(id = "1", emoji = "🚀", name = "Test 1", metricNoun = "times", targetAmount = 5, createdAtDate = LocalDate.parse("2024-01-01"))
-        val habit2 = Habit(id = "2", emoji = "🥗", name = "Test 2", metricNoun = "times", targetAmount = 3, createdAtDate = LocalDate.parse("2024-01-01"))
+        val habit1 =
+            Habit(
+                id = "1",
+                emoji = "🚀",
+                name = "Test 1",
+                metricNoun = "times",
+                targetAmount = 5,
+                createdAtDate = LocalDate.parse("2024-01-01")
+            )
+        val habit2 =
+            Habit(
+                id = "2",
+                emoji = "🥗",
+                name = "Test 2",
+                metricNoun = "times",
+                targetAmount = 3,
+                createdAtDate = LocalDate.parse("2024-01-01")
+            )
         val habits = listOf(
             HabitWithCompletions(habit = habit1, completions = emptyList()),
             HabitWithCompletions(habit = habit2, completions = emptyList())
         )
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(habits)
 
         viewModel = StatisticsViewModel(
@@ -108,7 +132,7 @@ class StatisticsViewModelTest {
 
             val successState = awaitItem() as StatisticsUiState.Success
             assertThat(successState.selectedHabitId).isEqualTo("2")
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }

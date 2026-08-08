@@ -12,4 +12,11 @@
     <string name="decrease">Decrease</string>
     <string name="increase">Increase</string>
     <string name="units">units</string>
+    <string name="emoji_error_empty">Emoji is required</string>
+    <string name="emoji_error_not_single">Must be a single emoji</string>
+    <string name="name_error_empty">Name is required</string>
+    <string name="metric_error_empty">Metric is required</string>
+    <string name="target_amount_error_empty">Target is required</string>
+    <string name="target_amount_error_not_a_number">Must be a number</string>
+    <string name="target_amount_error_not_positive">Must be greater than 0</string>
 </resources>

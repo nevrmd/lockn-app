@@ -1,15 +1,16 @@
 package com.nevrmd.domain.model
 
+import kotlinx.datetime.LocalDate
+
 data class MonthlyStat(
-    val monthName: String,
-    val year: Int,
+    val monthStart: LocalDate,
     val totalCompleted: Int,
     val totalTarget: Int,
     val metricNoun: String
 )
 
 data class DailyStat(
-    val dayName: String,
+    val date: LocalDate,
     val completedAmount: Int,
     val targetAmount: Int,
     val isToday: Boolean = false

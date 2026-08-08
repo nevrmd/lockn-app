@@ -24,8 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.theme.LocknAlpha
+import com.nevrmd.core.ui.util.displayName
 import com.nevrmd.domain.model.MonthlyStat
 import com.nevrmd.feature.statistics.R
 
@@ -40,7 +44,7 @@ fun MonthlyStatCard(
         modifier = modifier,
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = LocknAlpha.SURFACE_VARIANT_CONTAINER)
         )
     ) {
         Column(
@@ -56,7 +60,7 @@ fun MonthlyStatCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onPreviousMonth) {
                         Icon(
@@ -65,14 +69,15 @@ fun MonthlyStatCard(
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
-                    
+
                     Text(
-                        text = stat?.let { "${it.monthName} ${it.year}" } ?: "---",
+                        text = stat?.let { "${it.monthStart.month.displayName()} ${it.monthStart.year}" }
+                            ?: stringResource(R.string.month_placeholder),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     IconButton(onClick = onNextMonth) {
                         Icon(
                             imageVector = Icons.Filled.ChevronRight,
@@ -82,9 +87,9 @@ fun MonthlyStatCard(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             if (stat != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -97,7 +102,7 @@ fun MonthlyStatCard(
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.primary
                     )
-                    
+
                     Text(
                         text = " / ${stat.totalTarget}",
                         style = MaterialTheme.typography.headlineSmall,
@@ -105,9 +110,9 @@ fun MonthlyStatCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    
+
                     Spacer(modifier = Modifier.width(8.dp))
-                    
+
                     Text(
                         text = stat.metricNoun,
                         style = MaterialTheme.typography.titleMedium,
@@ -116,19 +121,29 @@ fun MonthlyStatCard(
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
-                val progress = if (stat.totalTarget > 0) (stat.totalCompleted.toFloat() / stat.totalTarget).coerceIn(0f, 1f) else 0f
-                
+
+                val progress = if (stat.totalTarget > 0) {
+                    (stat.totalCompleted.toFloat() / stat.totalTarget).coerceIn(
+                        0f,
+                        1f
+                    )
+                } else {
+                    0f
+                }
+
                 LinearProgressIndicator(
                     progress = { progress },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(12.dp)
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 12.dp)
+                        .semantics {
+                            stateDescription = "${stat.totalCompleted} / ${stat.totalTarget} ${stat.metricNoun}"
+                        },
                     color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    trackColor = MaterialTheme.colorScheme.primary.copy(alpha = LocknAlpha.PROGRESS_TRACK),
                     strokeCap = androidx.compose.ui.graphics.StrokeCap.Round
                 )
             } else {

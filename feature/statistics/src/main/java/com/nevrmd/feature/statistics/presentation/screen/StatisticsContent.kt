@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,13 +22,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.components.EmptyContent
+import com.nevrmd.core.ui.components.ErrorContent
+import com.nevrmd.core.ui.components.GlassyBackgroundGlows
+import com.nevrmd.core.ui.components.LoadingContent
 import com.nevrmd.feature.statistics.R
 import com.nevrmd.feature.statistics.presentation.event.StatisticsUiEvent
 import com.nevrmd.feature.statistics.presentation.screen.components.CompletionChart
-import com.nevrmd.feature.statistics.presentation.screen.components.EmptyStatistics
 import com.nevrmd.feature.statistics.presentation.screen.components.HabitFilterChips
 import com.nevrmd.feature.statistics.presentation.screen.components.MonthlyStatCard
-import com.nevrmd.feature.statistics.presentation.screen.components.StatisticsBackgroundGlows
 import com.nevrmd.feature.statistics.presentation.state.StatisticsUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,7 +51,12 @@ fun StatisticsContent(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            StatisticsBackgroundGlows()
+            GlassyBackgroundGlows(
+                primaryAlignment = Alignment.TopStart,
+                secondaryAlignment = Alignment.BottomEnd,
+                primaryOffset = Pair(-100, -50),
+                secondaryOffset = Pair(150, 100)
+            )
 
             Column(
                 modifier = Modifier
@@ -59,14 +65,10 @@ fun StatisticsContent(
             ) {
                 when (uiState) {
                     is StatisticsUiState.Loading -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            CircularProgressIndicator()
-                        }
+                        LoadingContent()
                     }
                     is StatisticsUiState.Error -> {
-                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(uiState.message, color = MaterialTheme.colorScheme.error)
-                        }
+                        ErrorContent(message = uiState.message)
                     }
                     is StatisticsUiState.Success -> {
                         HabitFilterChips(
@@ -76,7 +78,10 @@ fun StatisticsContent(
                         )
 
                         if (uiState.habits.isEmpty()) {
-                            EmptyStatistics(Modifier.weight(1f))
+                            EmptyContent(
+                                message = stringResource(R.string.create_habits_to_see_stats),
+                                modifier = Modifier.weight(1f)
+                            )
                         } else {
                             Column(
                                 modifier = Modifier
@@ -85,21 +90,21 @@ fun StatisticsContent(
                                     .padding(horizontal = 24.dp)
                             ) {
                                 Spacer(modifier = Modifier.height(16.dp))
-                                
+
                                 CompletionChart(
                                     dailyStats = uiState.weeklyStats,
                                     modifier = Modifier.fillMaxWidth()
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(24.dp))
-                                
+
                                 MonthlyStatCard(
                                     stat = uiState.monthlyStat,
                                     onPreviousMonth = { onEvent(StatisticsUiEvent.OnPreviousMonthClicked) },
                                     onNextMonth = { onEvent(StatisticsUiEvent.OnNextMonthClicked) },
                                     modifier = Modifier.fillMaxWidth()
                                 )
-                                
+
                                 Spacer(modifier = Modifier.height(120.dp))
                             }
                         }

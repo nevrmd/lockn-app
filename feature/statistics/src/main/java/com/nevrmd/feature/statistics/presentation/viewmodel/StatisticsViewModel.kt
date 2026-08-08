@@ -7,6 +7,7 @@ import com.nevrmd.domain.di.LocknDispatchers
 import com.nevrmd.domain.model.DailyStat
 import com.nevrmd.domain.usecase.GetHabitsForDateRangeUseCase
 import com.nevrmd.domain.util.DateUtils
+import com.nevrmd.domain.util.ErrorMessages
 import com.nevrmd.domain.util.StatisticsCalculator
 import com.nevrmd.feature.statistics.presentation.event.StatisticsUiEvent
 import com.nevrmd.feature.statistics.presentation.model.HabitUiModel
@@ -45,7 +46,7 @@ class StatisticsViewModel @Inject constructor(
     private val _selectedHabitIdFlow = MutableStateFlow<String?>(null)
 
     private val _weekDateRangeFlow = MutableStateFlow(DateUtils.getWeekRange(clock.todayIn(timeZone)))
-    
+
     private val _selectedMonthFlow = MutableStateFlow(DateUtils.getMonthRange(clock.todayIn(timeZone)).first)
 
     private val weeklyHabitsFlow = _weekDateRangeFlow.flatMapLatest { range ->
@@ -75,9 +76,9 @@ class StatisticsViewModel @Inject constructor(
         } else {
             val selectedHabitWithCompletions = weeklyHabits.find { it.habit.id == selectedHabitId }
                 ?: weeklyHabits.firstOrNull()
-            
+
             val actualSelectedId = selectedHabitWithCompletions?.habit?.id
-            
+
             val dailyStats = statisticsCalculator.calculateWeeklyStats(
                 habitWithCompletions = selectedHabitWithCompletions,
                 monday = weekRange.first,
@@ -88,7 +89,7 @@ class StatisticsViewModel @Inject constructor(
             val monthlyStat = statisticsCalculator.calculateMonthlyStat(monthlyHabitWithCompletions, monthStart)
 
             StatisticsUiState.Success(
-                habits = weeklyHabits.map { 
+                habits = weeklyHabits.map {
                     HabitUiModel(
                         id = it.habit.id,
                         emoji = it.habit.emoji,
@@ -102,7 +103,7 @@ class StatisticsViewModel @Inject constructor(
         }
         state
     }.flowOn(defaultDispatcher)
-        .catch { e -> emit(StatisticsUiState.Error(e.message ?: "Unknown error")) }
+        .catch { e -> emit(StatisticsUiState.Error(e.message ?: ErrorMessages.UNKNOWN)) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),

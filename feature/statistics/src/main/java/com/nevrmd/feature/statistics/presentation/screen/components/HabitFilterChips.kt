@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nevrmd.core.ui.theme.LocknAlpha
 import com.nevrmd.feature.statistics.presentation.model.HabitUiModel
 import kotlinx.collections.immutable.PersistentList
 
@@ -40,7 +41,7 @@ fun HabitFilterChips(
                 color = if (isSelected) {
                     MaterialTheme.colorScheme.primary
                 } else {
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = LocknAlpha.PRIMARY_CONTAINER_ICON)
                 },
                 contentColor = if (isSelected) {
                     MaterialTheme.colorScheme.onPrimary
