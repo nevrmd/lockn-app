@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:MonthlyStatCard.kt$@Composable fun MonthlyStatCard( stat: MonthlyStat?, onPreviousMonth: () -&gt; Unit, onNextMonth: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>MagicNumber:StatisticsViewModel.kt$StatisticsViewModel$5_000</ID>
+  </CurrentIssues>
+</SmellBaseline>

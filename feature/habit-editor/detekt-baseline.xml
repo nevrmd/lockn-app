@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:HabitEditorContent.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun HabitEditorContent( uiState: HabitEditorUiState.Success, onEvent: (HabitEditorUiEvent) -&gt; Unit, onBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+  </CurrentIssues>
+</SmellBaseline>

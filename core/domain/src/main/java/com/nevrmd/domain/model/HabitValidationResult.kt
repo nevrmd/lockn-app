@@ -6,8 +6,8 @@ data class HabitValidationResult(
     val metricNounError: ValidationError.MetricNoun? = null,
     val targetAmountError: ValidationError.TargetAmount? = null
 ) {
-    val isValid: Boolean = emojiError == null && 
-                          nameError == null && 
-                          metricNounError == null && 
-                          targetAmountError == null
+    val isValid: Boolean = emojiError == null &&
+        nameError == null &&
+        metricNounError == null &&
+        targetAmountError == null
 }

@@ -9,7 +9,7 @@ import kotlinx.datetime.LocalDate
 interface HabitRepository {
 
     fun getHabitsForDateRange(startDate: LocalDate, endDate: LocalDate): Flow<List<HabitWithCompletions>>
-    
+
     suspend fun getHabitById(id: String): Habit?
 
     suspend fun getHabitCompletion(habitId: String, dateCompleted: LocalDate): HabitCompletion?

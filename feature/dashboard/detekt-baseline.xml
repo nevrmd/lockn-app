@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongMethod:DashboardContent.kt$@Composable fun DashboardContent( uiState: DashboardUiState, onEvent: (DashboardUiEvent) -&gt; Unit, onNavigateToHabitEditor: (habitId: String?, initialDate: String?) -&gt; Unit, snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }, modifier: Modifier = Modifier, )</ID>
+    <ID>LongMethod:HabitItemCard.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun HabitItemCard( habit: HabitUiModel, onClick: () -&gt; Unit, onEdit: () -&gt; Unit, onDelete: () -&gt; Unit, onIncrement: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>MagicNumber:DashboardViewModel.kt$DashboardViewModel$5_000</ID>
+    <ID>MagicNumber:DashboardViewModel.kt$DashboardViewModel$6</ID>
+  </CurrentIssues>
+</SmellBaseline>

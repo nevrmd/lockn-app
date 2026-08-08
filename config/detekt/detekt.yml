@@ -1,0 +1,59 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+comments:
+  UndocumentedPublicClass:
+    active: false
+  UndocumentedPublicFunction:
+    active: false
+  UndocumentedPublicProperty:
+    active: false
+
+complexity:
+  LongMethod:
+    threshold: 90
+  LongParameterList:
+    active: false # Compose functions legitimately take many parameters (uiState, onEvent, modifier, ...)
+  TooManyFunctions:
+    active: false
+
+style:
+  MagicNumber:
+    ignoreAnnotated:
+      - Composable
+    ignoreNumbers:
+      - '-1'
+      - '0'
+      - '1'
+      - '2'
+    excludes:
+      # These files ARE the well-named constants MagicNumber otherwise asks for.
+      - '**/theme/Color.kt'
+      - '**/theme/Type.kt'
+      - '**/theme/Shape.kt'
+      - '**/theme/Spacing.kt'
+      # Test fixture data (amounts, dates, counts) isn't a maintainability concern.
+      - '**/test/**'
+      - '**/androidTest/**'
+  WildcardImport:
+    active: true
+  MaxLineLength:
+    active: false
+
+formatting:
+  PackageName:
+    # ktlint's rule has no configurable pattern; underscores are an intentional
+    # choice here (see naming.PackageNaming below) for hyphenated module names.
+    active: false
+
+naming:
+  FunctionNaming:
+    # Allows PascalCase, since Composable functions are named like types (e.g. `DashboardScreen`).
+    functionPattern: '[a-zA-Z][a-zA-Z0-9]*'
+  PackageNaming:
+    # Allows underscores, since module names with hyphens (e.g. `habit-editor`) become underscored packages.
+    packagePattern: '[a-z]+(\.[a-z][a-zA-Z0-9_]*)*'

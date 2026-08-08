@@ -19,7 +19,7 @@ class ValidateHabitUseCase @Inject constructor() {
 
         val nameError = if (name.isBlank()) ValidationError.Name.Empty else null
         val metricNounError = if (metricNoun.isBlank()) ValidationError.MetricNoun.Empty else null
-        
+
         val targetAmountInt = targetAmount.toIntOrNull()
         val targetAmountError = when {
             targetAmount.isBlank() -> ValidationError.TargetAmount.Empty
@@ -38,7 +38,7 @@ class ValidateHabitUseCase @Inject constructor() {
 
     private fun isSingleEmoji(text: String): Boolean {
         if (text.isBlank()) return false
-        
+
         return text.codePointCount(0, text.length) == 1
     }
 }

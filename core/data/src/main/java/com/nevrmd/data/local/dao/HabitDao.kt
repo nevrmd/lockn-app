@@ -24,7 +24,7 @@ interface HabitDao {
         startDateString: String,
         endDateString: String
     ): Flow<Map<HabitEntity, List<HabitCompletionEntity>>>
-    
+
     @Query("SELECT * FROM habits WHERE id = :id")
     suspend fun getHabitById(
         id: String
