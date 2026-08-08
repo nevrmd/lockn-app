@@ -28,7 +28,7 @@ android {
 
 dependencies {
     implementation(project(":core:domain"))
-    implementation(project(":core:navigation"))
+    implementation(project(":core:ui"))
     
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
@@ -52,4 +52,6 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

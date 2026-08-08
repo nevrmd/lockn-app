@@ -8,5 +8,4 @@ annotation class Dispatcher(val locknDispatcher: LocknDispatchers)
 
 enum class LocknDispatchers {
     Default,
-    IO,
 }
