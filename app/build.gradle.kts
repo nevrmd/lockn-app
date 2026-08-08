@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:domain"))
     implementation(project(":core:navigation"))
+    implementation(project(":core:ui"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:habit-editor"))
     implementation(project(":feature:statistics"))

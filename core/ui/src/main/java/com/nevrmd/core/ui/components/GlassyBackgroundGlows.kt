@@ -1,4 +1,4 @@
-package com.nevrmd.feature.dashboard.presentation.screen.components
+package com.nevrmd.core.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,21 +14,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun BackgroundGlows(
+fun GlassyBackgroundGlows(
     modifier: Modifier = Modifier,
     primaryColor: Color = MaterialTheme.colorScheme.primary,
-    secondaryColor: Color = MaterialTheme.colorScheme.secondary
+    secondaryColor: Color = MaterialTheme.colorScheme.secondary,
+    primaryAlpha: Float = 0.12f,
+    secondaryAlpha: Float = 0.12f,
+    primaryAlignment: Alignment = Alignment.TopEnd,
+    secondaryAlignment: Alignment = Alignment.CenterStart,
+    primaryOffset: Pair<Int, Int> = Pair(50, -100),
+    secondaryOffset: Pair<Int, Int> = Pair(-150, 0)
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .size(300.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = 50.dp, y = (-100).dp)
+                .align(primaryAlignment)
+                .offset(x = primaryOffset.first.dp, y = primaryOffset.second.dp)
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            primaryColor.copy(alpha = 0.12f),
+                            primaryColor.copy(alpha = primaryAlpha),
                             Color.Transparent
                         )
                     )
@@ -37,12 +43,12 @@ fun BackgroundGlows(
         Box(
             modifier = Modifier
                 .size(400.dp)
-                .align(Alignment.CenterStart)
-                .offset(x = (-150).dp)
+                .align(secondaryAlignment)
+                .offset(x = secondaryOffset.first.dp, y = secondaryOffset.second.dp)
                 .background(
                     Brush.radialGradient(
                         colors = listOf(
-                            secondaryColor.copy(alpha = 0.12f),
+                            secondaryColor.copy(alpha = secondaryAlpha),
                             Color.Transparent
                         )
                     )
