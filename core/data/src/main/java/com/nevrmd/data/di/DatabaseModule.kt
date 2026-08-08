@@ -22,7 +22,11 @@ object DatabaseModule {
             context,
             HabitDatabase::class.java,
             "habit_database"
-        ).build()
+        )
+            // TODO(schema v2+): replace with real, tested Migration objects — this is a
+            // stopgap so a future schema change doesn't hard-crash existing installs.
+            .fallbackToDestructiveMigration(dropAllTables = true)
+            .build()
     }
 
     @Provides

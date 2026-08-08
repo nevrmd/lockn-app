@@ -2,6 +2,7 @@ package com.nevrmd.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 
 @Entity(
     tableName = "habit_completions",
@@ -13,7 +14,8 @@ import androidx.room.ForeignKey
             childColumns = ["habitId"],
             onDelete = ForeignKey.CASCADE
         )
-    ]
+    ],
+    indices = [Index(value = ["habitId"])]
 )
 data class HabitCompletionEntity(
     val habitId: String,

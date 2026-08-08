@@ -11,7 +11,7 @@ import com.nevrmd.data.local.entity.HabitEntity
         HabitEntity::class,
         HabitCompletionEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 abstract class HabitDatabase : RoomDatabase() {
