@@ -1,21 +1,29 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Room, Hilt, and kotlinx.datetime/coroutines ship their own consumer ProGuard rules
+# (bundled in their AARs) and don't need explicit rules here. Verified by manually
+# installing and exercising a release build after enabling minification.
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# kotlinx.serialization is used for the type-safe Nav-Compose `Route` sealed interface
+# (core:navigation). Keep the generated serializers so nav-arg (de)serialization survives
+# R8 — this is a known gotcha for sealed interfaces specifically, since their serializer
+# lookup happens via reflection at decode time rather than a static call site.
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.AnnotationsKt
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepclassmembers class kotlinx.serialization.json.** {
+    *** Companion;
+}
+-keepclasseswithmembers class kotlinx.serialization.json.** {
+    kotlinx.serialization.KSerializer serializer(...);
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keepclassmembers class com.nevrmd.navigation.** {
+    *** Companion;
+}
+-if @kotlinx.serialization.Serializable class com.nevrmd.navigation.**
+-keepclassmembers class <1>$Companion {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-if @kotlinx.serialization.Serializable class com.nevrmd.navigation.**
+-keepclassmembers class <1> {
+    *** Companion;
+}

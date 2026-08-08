@@ -16,3 +16,8 @@ local.properties
 
 # Project exclude paths
 /core/navigation/build/
+
+# Release signing (never commit real keystores or credentials)
+keystore.properties
+*.keystore
+*.jks
