@@ -1,7 +1,7 @@
 package com.nevrmd.feature.dashboard.presentation.state
 
-import com.nevrmd.domain.model.HabitWithCompletions
 import com.nevrmd.feature.dashboard.domain.model.DayUiModel
+import com.nevrmd.feature.dashboard.presentation.model.HabitUiModel
 
 sealed interface DashboardUiState {
 
@@ -17,6 +17,6 @@ sealed interface DashboardUiState {
     data class Success(
         val selectedDateString: String,
         val weekDays: List<DayUiModel>,
-        val habits: List<HabitWithCompletions>
+        val habits: List<HabitUiModel>
     ) : DashboardUiState
 }

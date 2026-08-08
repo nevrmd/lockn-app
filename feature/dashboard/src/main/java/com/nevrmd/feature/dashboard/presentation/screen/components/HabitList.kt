@@ -7,13 +7,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.nevrmd.domain.model.HabitWithCompletions
+import com.nevrmd.core.ui.theme.LocknSpacing
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
+import com.nevrmd.feature.dashboard.presentation.model.HabitUiModel
 
 @Composable
 fun HabitList(
-    habits: List<HabitWithCompletions>,
+    habits: List<HabitUiModel>,
     onEvent: (DashboardUiEvent) -> Unit,
     onHabitClick: (String) -> Unit,
     onEditHabit: (String) -> Unit,
@@ -22,22 +22,22 @@ fun HabitList(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(bottom = 100.dp, top = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        contentPadding = PaddingValues(bottom = LocknSpacing.bottomBarClearance, top = LocknSpacing.xs),
+        verticalArrangement = Arrangement.spacedBy(LocknSpacing.xxs)
     ) {
         items(
             items = habits,
-            key = { habitWithCompletions -> habitWithCompletions.habit.id }
+            key = { habit -> habit.id }
         ) { item ->
             HabitItemCard(
-                habitWithCompletions = item,
-                onClick = { onHabitClick(item.habit.id) },
-                onEdit = { onEditHabit(item.habit.id) },
-                onDelete = { onDeleteHabit(item.habit.id) },
+                habit = item,
+                onClick = { onHabitClick(item.id) },
+                onEdit = { onEditHabit(item.id) },
+                onDelete = { onDeleteHabit(item.id) },
                 onIncrement = {
                     onEvent(
                         DashboardUiEvent.OnIncrementHabit(
-                            habitId = item.habit.id,
+                            habitId = item.id,
                             incrementBy = 1
                         )
                     )

@@ -17,6 +17,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,14 +28,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.nevrmd.core.ui.components.EmptyContent
+import com.nevrmd.core.ui.components.ErrorContent
+import com.nevrmd.core.ui.components.GlassyBackgroundGlows
+import com.nevrmd.core.ui.components.LoadingContent
+import com.nevrmd.core.ui.theme.LocknAlpha
+import com.nevrmd.core.ui.theme.LocknSpacing
 import com.nevrmd.feature.dashboard.R
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
-import com.nevrmd.feature.dashboard.presentation.screen.components.BackgroundGlows
 import com.nevrmd.feature.dashboard.presentation.screen.components.DeleteHabitDialog
-import com.nevrmd.feature.dashboard.presentation.screen.components.EmptyContent
-import com.nevrmd.feature.dashboard.presentation.screen.components.ErrorContent
 import com.nevrmd.feature.dashboard.presentation.screen.components.HabitList
-import com.nevrmd.feature.dashboard.presentation.screen.components.LoadingContent
 import com.nevrmd.feature.dashboard.presentation.screen.components.WeekCalendarHeader
 import com.nevrmd.feature.dashboard.presentation.state.DashboardUiState
 
@@ -42,6 +46,7 @@ fun DashboardContent(
     uiState: DashboardUiState,
     onEvent: (DashboardUiEvent) -> Unit,
     onNavigateToHabitEditor: (habitId: String?, initialDate: String?) -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     modifier: Modifier = Modifier,
 ) {
     val selectedDate = when (uiState) {
@@ -66,11 +71,12 @@ fun DashboardContent(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             if (showFab) {
                 FloatingActionButton(
                     onClick = { onNavigateToHabitEditor(null, selectedDate) },
-                    modifier = Modifier.padding(bottom = 100.dp),
+                    modifier = Modifier.padding(bottom = LocknSpacing.bottomBarClearance),
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(16.dp)
@@ -85,7 +91,7 @@ fun DashboardContent(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize()) {
-            BackgroundGlows()
+            GlassyBackgroundGlows()
 
             Column(
                 modifier = Modifier
@@ -111,7 +117,10 @@ fun DashboardContent(
                             onEvent = onEvent,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                         )
-                        EmptyContent(modifier = Modifier.weight(1f))
+                        EmptyContent(
+                            message = stringResource(R.string.no_habits_for_date),
+                            modifier = Modifier.weight(1f)
+                        )
                     }
 
                     is DashboardUiState.Success -> {
@@ -141,7 +150,7 @@ fun DashboardContent(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.4f))
+                        .background(Color.Black.copy(alpha = LocknAlpha.SCRIM))
                 )
             }
         }

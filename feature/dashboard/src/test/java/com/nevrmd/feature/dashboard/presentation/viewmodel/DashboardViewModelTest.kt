@@ -7,13 +7,12 @@ import com.nevrmd.domain.model.HabitWithCompletions
 import com.nevrmd.domain.usecase.DeleteHabitUseCase
 import com.nevrmd.domain.usecase.GetHabitsForDateRangeUseCase
 import com.nevrmd.domain.usecase.SaveIncrementHabitCompletionUseCase
+import com.nevrmd.domain.util.DataResult
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
 import com.nevrmd.feature.dashboard.presentation.state.DashboardUiState
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,7 +39,7 @@ class DashboardViewModelTest {
     private lateinit var getHabitsForDateRangeUseCase: GetHabitsForDateRangeUseCase
     private lateinit var saveIncrementHabitCompletionUseCase: SaveIncrementHabitCompletionUseCase
     private lateinit var deleteHabitUseCase: DeleteHabitUseCase
-    
+
     private val clock = object : Clock {
         override fun now(): Instant = Instant.parse("2024-01-01T00:00:00Z")
     }
@@ -52,7 +51,7 @@ class DashboardViewModelTest {
         getHabitsForDateRangeUseCase = mockk()
         saveIncrementHabitCompletionUseCase = mockk()
         deleteHabitUseCase = mockk()
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(emptyList())
     }
 
@@ -65,14 +64,21 @@ class DashboardViewModelTest {
     fun `when OnDateSelected is emitted, uiState is updated with new date`() = runTest {
         val initialDate = LocalDate.parse("2024-01-01")
         val newDate = "2024-01-02"
-        
+
         val habits = listOf(
             HabitWithCompletions(
-                habit = Habit(id = "1", emoji = "🚀", name = "Test", metricNoun = "times", targetAmount = 5, createdAtDate = initialDate),
+                habit = Habit(
+                    id = "1",
+                    emoji = "🚀",
+                    name = "Test",
+                    metricNoun = "times",
+                    targetAmount = 5,
+                    createdAtDate = initialDate
+                ),
                 completions = emptyList()
             )
         )
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(habits)
 
         viewModel = DashboardViewModel(
@@ -87,7 +93,7 @@ class DashboardViewModelTest {
         viewModel.uiState.test {
             val firstItem = awaitItem()
             val firstSuccess = if (firstItem is DashboardUiState.Loading) awaitItem() else firstItem
-            
+
             assertThat(firstSuccess).isInstanceOf(DashboardUiState.Success::class.java)
             assertThat((firstSuccess as DashboardUiState.Success).selectedDateString).isEqualTo(initialDate.toString())
 
@@ -95,7 +101,7 @@ class DashboardViewModelTest {
 
             val secondSuccess = awaitItem() as DashboardUiState.Success
             assertThat(secondSuccess.selectedDateString).isEqualTo(newDate)
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -106,7 +112,7 @@ class DashboardViewModelTest {
         val incrementBy = 1
         val date = clock.todayIn(timeZone)
 
-        coEvery { saveIncrementHabitCompletionUseCase(any(), any(), any()) } just Runs
+        coEvery { saveIncrementHabitCompletionUseCase(any(), any(), any()) } returns DataResult.Success(Unit)
 
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,
@@ -140,7 +146,7 @@ class DashboardViewModelTest {
         )
 
         viewModel.uiState.test {
-            awaitItem() 
+            awaitItem()
 
             viewModel.onEvent(DashboardUiEvent.OnNextWeekClicked)
 
@@ -176,14 +182,21 @@ class DashboardViewModelTest {
     fun `when habit created in future, it is filtered out from current selected date`() = runTest {
         val today = LocalDate.parse("2024-01-01")
         val tomorrow = LocalDate.parse("2024-01-02")
-        
+
         val habits = listOf(
             HabitWithCompletions(
-                habit = Habit(id = "1", emoji = "🚀", name = "Future Habit", metricNoun = "times", targetAmount = 5, createdAtDate = tomorrow),
+                habit = Habit(
+                    id = "1",
+                    emoji = "🚀",
+                    name = "Future Habit",
+                    metricNoun = "times",
+                    targetAmount = 5,
+                    createdAtDate = tomorrow
+                ),
                 completions = emptyList()
             )
         )
-        
+
         every { getHabitsForDateRangeUseCase(any(), any()) } returns flowOf(habits)
 
         viewModel = DashboardViewModel(
@@ -197,13 +210,13 @@ class DashboardViewModelTest {
 
         viewModel.uiState.test {
             val state = awaitItem()
-            
+
             if (state is DashboardUiState.Empty) {
                 assertThat(state.selectedDateString).isEqualTo(today.toString())
             } else if (state is DashboardUiState.Success) {
                 assertThat(state.habits).isEmpty()
             }
-            
+
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -212,7 +225,7 @@ class DashboardViewModelTest {
     fun `when OnDeleteHabit is emitted, deleteHabitUseCase is executed exactly once`() = runTest {
         val habitId = "1"
 
-        coEvery { deleteHabitUseCase(any()) } just Runs
+        coEvery { deleteHabitUseCase(any()) } returns DataResult.Success(Unit)
 
         viewModel = DashboardViewModel(
             getHabitsForDateRangeUseCase,

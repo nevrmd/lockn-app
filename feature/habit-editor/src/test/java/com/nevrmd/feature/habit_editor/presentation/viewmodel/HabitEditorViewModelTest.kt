@@ -4,17 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.navigation.toRoute
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.nevrmd.domain.navigation.Route
 import com.nevrmd.domain.usecase.GetHabitByIdUseCase
 import com.nevrmd.domain.usecase.SaveHabitUseCase
 import com.nevrmd.domain.usecase.ValidateHabitUseCase
+import com.nevrmd.domain.util.DataResult
 import com.nevrmd.feature.habit_editor.presentation.event.HabitEditorUiEvent
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
-import io.mockk.Runs
+import com.nevrmd.domain.navigation.Route
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
@@ -53,7 +52,7 @@ class HabitEditorViewModelTest {
         saveHabitUseCase = mockk()
         getHabitByIdUseCase = mockk()
         validateHabitUseCase = ValidateHabitUseCase()
-        
+
         mockkStatic("androidx.navigation.SavedStateHandleKt")
     }
 
@@ -66,9 +65,11 @@ class HabitEditorViewModelTest {
     @Test
     fun `when valid data is saved in Create Mode, usecase is called and HabitSaved effect is emitted`() = runTest {
         val savedStateHandle = mockk<SavedStateHandle>(relaxed = true)
-        every { savedStateHandle.toRoute<Route.HabitEditor>() } returns Route.HabitEditor(habitId = null, initialDate = "2024-01-01")
-        
-        coEvery { saveHabitUseCase(any()) } just Runs
+        every {
+            savedStateHandle.toRoute<Route.HabitEditor>()
+        } returns Route.HabitEditor(habitId = null, initialDate = "2024-01-01")
+
+        coEvery { saveHabitUseCase(any()) } returns DataResult.Success(Unit)
 
         viewModel = HabitEditorViewModel(
             saveHabitUseCase,
@@ -84,11 +85,11 @@ class HabitEditorViewModelTest {
             viewModel.onEvent(HabitEditorUiEvent.OnNameChanged("Exercise"))
             viewModel.onEvent(HabitEditorUiEvent.OnMetricNounChanged("minutes"))
             viewModel.onEvent(HabitEditorUiEvent.OnTargetAmountChanged("30"))
-            
+
             viewModel.onEvent(HabitEditorUiEvent.OnSaveHabit)
 
             assertThat(awaitItem()).isEqualTo(HabitEditorEffect.HabitSaved)
-            
+
             coVerify(exactly = 1) { saveHabitUseCase(any()) }
             cancelAndIgnoreRemainingEvents()
         }
@@ -114,7 +115,7 @@ class HabitEditorViewModelTest {
 
             val state = expectMostRecentItem() as HabitEditorUiState.Success
             assertThat(state.nameError).isNotNull()
-            
+
             coVerify(exactly = 0) { saveHabitUseCase(any()) }
             cancelAndIgnoreRemainingEvents()
         }
@@ -148,7 +149,7 @@ class HabitEditorViewModelTest {
 
         viewModel.uiState.test {
             val state = expectMostRecentItem() as HabitEditorUiState.Success
-            
+
             assertThat(state.name).isEqualTo("Run")
             assertThat(state.emoji).isEqualTo("🏃")
             cancelAndIgnoreRemainingEvents()

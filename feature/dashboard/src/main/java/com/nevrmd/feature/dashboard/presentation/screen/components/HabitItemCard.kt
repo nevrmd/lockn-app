@@ -34,26 +34,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.nevrmd.domain.model.HabitWithCompletions
+import com.nevrmd.core.ui.theme.LocknAlpha
 import com.nevrmd.feature.dashboard.R
+import com.nevrmd.feature.dashboard.presentation.model.HabitUiModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HabitItemCard(
-    habitWithCompletions: HabitWithCompletions,
+    habit: HabitUiModel,
     onClick: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     onIncrement: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val habit = habitWithCompletions.habit
-    val currentCount = habitWithCompletions.completions?.sumOf { it.amountCompleted } ?: 0
+    val currentCount = habit.currentAmount
     val targetCount = habit.targetAmount
     val progress = if (targetCount > 0) (currentCount.toFloat() / targetCount).coerceIn(0f, 1f) else 0f
 
@@ -70,7 +71,9 @@ fun HabitItemCard(
                     onLongClick = { showMenu = true }
                 ),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                    alpha = LocknAlpha.SURFACE_VARIANT_CONTAINER
+                )
             ),
             elevation = CardDefaults.cardElevation(0.dp)
         ) {
@@ -84,7 +87,9 @@ fun HabitItemCard(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
+                        .background(
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = LocknAlpha.PRIMARY_CONTAINER_ICON)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = habit.emoji, fontSize = 28.sp)
@@ -104,17 +109,20 @@ fun HabitItemCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     LinearProgressIndicator(
                         progress = { progress },
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(8.dp)
-                            .clip(CircleShape),
+                            .clip(CircleShape)
+                            .semantics {
+                                stateDescription = "$currentCount / $targetCount ${habit.metricNoun}"
+                            },
                         color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                        trackColor = MaterialTheme.colorScheme.primary.copy(alpha = LocknAlpha.PROGRESS_TRACK)
                     )
                 }
 

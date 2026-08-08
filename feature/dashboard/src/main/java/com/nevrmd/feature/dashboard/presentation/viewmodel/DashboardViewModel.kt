@@ -8,13 +8,17 @@ import com.nevrmd.domain.model.HabitWithCompletions
 import com.nevrmd.domain.usecase.DeleteHabitUseCase
 import com.nevrmd.domain.usecase.GetHabitsForDateRangeUseCase
 import com.nevrmd.domain.usecase.SaveIncrementHabitCompletionUseCase
+import com.nevrmd.domain.util.DataResult
 import com.nevrmd.domain.util.DateUtils
+import com.nevrmd.domain.util.ErrorMessages
 import com.nevrmd.feature.dashboard.domain.model.DayUiModel
 import com.nevrmd.feature.dashboard.presentation.event.DashboardUiEvent
+import com.nevrmd.feature.dashboard.presentation.model.HabitUiModel
 import com.nevrmd.feature.dashboard.presentation.state.DashboardUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +26,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -45,6 +50,9 @@ class DashboardViewModel @Inject constructor(
 
     private val _selectedDateFlow = MutableStateFlow(clock.todayIn(timeZone))
 
+    private val _effects = Channel<DashboardEffect>()
+    val effects = _effects.receiveAsFlow()
+
     private val habitsFlow = _selectedDateFlow.flatMapLatest { date ->
         val (monday, sunday) = DateUtils.getWeekRange(date)
 
@@ -52,17 +60,15 @@ class DashboardViewModel @Inject constructor(
     }
 
     val uiState: StateFlow<DashboardUiState> = combine(
-        _selectedDateFlow, habitsFlow
+        _selectedDateFlow,
+        habitsFlow
     ) { selectedDate, habits ->
-        val weekDays = calculateWeekDays(selectedDate, habits)
-        val filteredHabits = habits
+        val weekDays = calculateWeekDays(selectedDate)
+        val visibleHabits = habits
             .filter { it.habit.createdAtDate <= selectedDate }
-            .map { habitWithCompletions ->
-                habitWithCompletions.copy(
-                    completions = habitWithCompletions.completions?.filter { it.dateCompleted == selectedDate })
-            }
+            .map { it.toUiModel(selectedDate) }
 
-        if (filteredHabits.isEmpty()) {
+        if (visibleHabits.isEmpty()) {
             DashboardUiState.Empty(
                 selectedDateString = selectedDate.toString(),
                 weekDays = weekDays
@@ -71,16 +77,16 @@ class DashboardViewModel @Inject constructor(
             DashboardUiState.Success(
                 selectedDateString = selectedDate.toString(),
                 weekDays = weekDays,
-                habits = filteredHabits
+                habits = visibleHabits
             )
         }
     }.flowOn(defaultDispatcher).catch { e ->
-            emit(DashboardUiState.Error(e.message ?: "Unknown error"))
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = DashboardUiState.Loading
-        )
+        emit(DashboardUiState.Error(e.message ?: ErrorMessages.UNKNOWN))
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = DashboardUiState.Loading
+    )
 
     fun onEvent(event: DashboardUiEvent) {
         when (event) {
@@ -90,11 +96,14 @@ class DashboardViewModel @Inject constructor(
 
             is DashboardUiEvent.OnIncrementHabit -> {
                 viewModelScope.launch {
-                    saveIncrementHabitCompletionUseCase(
+                    val result = saveIncrementHabitCompletionUseCase(
                         habitId = event.habitId,
                         incrementBy = event.incrementBy,
                         dateCompleted = _selectedDateFlow.value
                     )
+                    if (result is DataResult.Error) {
+                        _effects.send(DashboardEffect.ShowError(result.message ?: ErrorMessages.UNKNOWN))
+                    }
                 }
             }
 
@@ -108,7 +117,10 @@ class DashboardViewModel @Inject constructor(
 
             is DashboardUiEvent.OnDeleteHabit -> {
                 viewModelScope.launch {
-                    deleteHabitUseCase(event.habitId)
+                    val result = deleteHabitUseCase(event.habitId)
+                    if (result is DataResult.Error) {
+                        _effects.send(DashboardEffect.ShowError(result.message ?: ErrorMessages.UNKNOWN))
+                    }
                 }
             }
         }
@@ -117,7 +129,7 @@ class DashboardViewModel @Inject constructor(
     private fun updateSelectedDateByOffset(weeksOffset: Int) {
         val currentSelectedDate = _selectedDateFlow.value
         val (currentMonday, _) = DateUtils.getWeekRange(currentSelectedDate)
-        
+
         val targetWeekMonday = currentMonday.plus(DatePeriod(days = weeksOffset * 7))
         val targetWeekSunday = targetWeekMonday.plus(DatePeriod(days = 6))
 
@@ -130,24 +142,31 @@ class DashboardViewModel @Inject constructor(
         }
     }
 
-    private fun calculateWeekDays(
-        selectedDate: LocalDate, habits: List<HabitWithCompletions>
-    ): List<DayUiModel> {
+    private fun calculateWeekDays(selectedDate: LocalDate): List<DayUiModel> {
         val (monday, _) = DateUtils.getWeekRange(selectedDate)
 
         return (0..6).map { i ->
             val dayDate = monday.plus(DatePeriod(days = i))
-            val dayDateString = dayDate.toString()
-            DayUiModel(
-                dateString = dayDateString,
-                habits = habits
-                    .filter { it.habit.createdAtDate <= dayDate }
-                    .map { habitWithCompletions ->
-                        habitWithCompletions.copy(
-                            completions = habitWithCompletions.completions?.filter { it.dateCompleted == dayDate }
-                        )
-                    }
-            )
+            DayUiModel(dateString = dayDate.toString())
         }
     }
+
+    private fun HabitWithCompletions.toUiModel(date: LocalDate): HabitUiModel {
+        val currentAmount = completions
+            .filter { it.dateCompleted == date }
+            .sumOf { it.amountCompleted }
+
+        return HabitUiModel(
+            id = habit.id,
+            emoji = habit.emoji,
+            name = habit.name,
+            metricNoun = habit.metricNoun,
+            currentAmount = currentAmount,
+            targetAmount = habit.targetAmount
+        )
+    }
+}
+
+sealed interface DashboardEffect {
+    data class ShowError(val message: String) : DashboardEffect
 }

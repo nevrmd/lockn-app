@@ -5,13 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.nevrmd.domain.model.DraftHabit
-import com.nevrmd.domain.navigation.Route
 import com.nevrmd.domain.usecase.GetHabitByIdUseCase
 import com.nevrmd.domain.usecase.SaveHabitUseCase
 import com.nevrmd.domain.usecase.ValidateHabitUseCase
+import com.nevrmd.domain.util.DataResult
+import com.nevrmd.domain.util.ErrorMessages
 import com.nevrmd.feature.habit_editor.presentation.event.HabitEditorUiEvent
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorMode
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
+import com.nevrmd.domain.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -71,7 +73,7 @@ class HabitEditorViewModel @Inject constructor(
                         createdAt = habit.createdAtDate
                     )
                 } else {
-                    _uiState.value = HabitEditorUiState.Error("Habit not found")
+                    _uiState.value = HabitEditorUiState.Error(ErrorMessages.HABIT_NOT_FOUND)
                 }
             }
         }
@@ -81,37 +83,53 @@ class HabitEditorViewModel @Inject constructor(
         when (event) {
             is HabitEditorUiEvent.OnEmojiChanged -> {
                 _uiState.update { state ->
-                    if (state is HabitEditorUiState.Success) state.copy(
-                        emoji = event.emoji,
-                        emojiError = null
-                    ) else state
+                    if (state is HabitEditorUiState.Success) {
+                        state.copy(
+                            emoji = event.emoji,
+                            emojiError = null
+                        )
+                    } else {
+                        state
+                    }
                 }
             }
 
             is HabitEditorUiEvent.OnNameChanged -> {
                 _uiState.update { state ->
-                    if (state is HabitEditorUiState.Success) state.copy(
-                        name = event.name,
-                        nameError = null
-                    ) else state
+                    if (state is HabitEditorUiState.Success) {
+                        state.copy(
+                            name = event.name,
+                            nameError = null
+                        )
+                    } else {
+                        state
+                    }
                 }
             }
 
             is HabitEditorUiEvent.OnMetricNounChanged -> {
                 _uiState.update { state ->
-                    if (state is HabitEditorUiState.Success) state.copy(
-                        metricNoun = event.metricNoun,
-                        metricNounError = null
-                    ) else state
+                    if (state is HabitEditorUiState.Success) {
+                        state.copy(
+                            metricNoun = event.metricNoun,
+                            metricNounError = null
+                        )
+                    } else {
+                        state
+                    }
                 }
             }
 
             is HabitEditorUiEvent.OnTargetAmountChanged -> {
                 _uiState.update { state ->
-                    if (state is HabitEditorUiState.Success) state.copy(
-                        targetAmount = event.targetAmount,
-                        targetAmountError = null
-                    ) else state
+                    if (state is HabitEditorUiState.Success) {
+                        state.copy(
+                            targetAmount = event.targetAmount,
+                            targetAmountError = null
+                        )
+                    } else {
+                        state
+                    }
                 }
             }
 
@@ -145,19 +163,19 @@ class HabitEditorViewModel @Inject constructor(
 
             _uiState.update { if (it is HabitEditorUiState.Success) it.copy(isSaving = true) else it }
             viewModelScope.launch {
-                try {
-                    val draftHabit = DraftHabit(
-                        id = state.habitId ?: Uuid.random().toString(),
-                        emoji = state.emoji,
-                        name = state.name,
-                        metricNoun = state.metricNoun,
-                        targetAmount = state.targetAmount.toInt(),
-                        createdAtDate = state.createdAt
-                    )
-                    saveHabitUseCase(draftHabit)
-                    _events.send(HabitEditorEffect.HabitSaved)
-                } catch (e: Exception) {
-                    _uiState.value = HabitEditorUiState.Error(e.message ?: "Unknown error")
+                val draftHabit = DraftHabit(
+                    id = state.habitId ?: Uuid.random().toString(),
+                    emoji = state.emoji,
+                    name = state.name,
+                    metricNoun = state.metricNoun,
+                    targetAmount = state.targetAmount.toInt(),
+                    createdAtDate = state.createdAt
+                )
+                when (val result = saveHabitUseCase(draftHabit)) {
+                    is DataResult.Success -> _events.send(HabitEditorEffect.HabitSaved)
+                    is DataResult.Error -> {
+                        _uiState.value = HabitEditorUiState.Error(result.message ?: ErrorMessages.UNKNOWN)
+                    }
                 }
             }
         }
