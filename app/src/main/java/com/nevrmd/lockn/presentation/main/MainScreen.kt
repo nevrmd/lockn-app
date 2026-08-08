@@ -25,11 +25,11 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -38,8 +38,8 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.nevrmd.domain.navigation.Route
 import com.nevrmd.lockn.presentation.components.LocknNavHost
+import com.nevrmd.navigation.Route
 
 @Composable
 fun MainScreen() {
@@ -48,8 +48,18 @@ fun MainScreen() {
     val currentDestination = navBackStackEntry?.destination
 
     val topLevelRoutes = listOf(
-        TopLevelRoute(stringResource(com.nevrmd.lockn.R.string.dashboard), Route.Dashboard, Icons.Filled.Dashboard, Icons.Outlined.Dashboard),
-        TopLevelRoute(stringResource(com.nevrmd.lockn.R.string.statistics), Route.Statistics, Icons.Filled.BarChart, Icons.Outlined.BarChart)
+        TopLevelRoute(
+            stringResource(com.nevrmd.lockn.R.string.dashboard),
+            Route.Dashboard,
+            Icons.Filled.Dashboard,
+            Icons.Outlined.Dashboard
+        ),
+        TopLevelRoute(
+            stringResource(com.nevrmd.lockn.R.string.statistics),
+            Route.Statistics,
+            Icons.Filled.BarChart,
+            Icons.Outlined.BarChart
+        )
     )
 
     val isBottomBarVisible = topLevelRoutes.any { route ->
@@ -92,8 +102,8 @@ private fun GlassyBottomBar(
             windowInsets = WindowInsets.navigationBars
         ) {
             topLevelRoutes.forEach { topLevelRoute ->
-                val isSelected = currentDestination?.hierarchy?.any { 
-                    it.hasRoute(topLevelRoute.route::class) 
+                val isSelected = currentDestination?.hierarchy?.any {
+                    it.hasRoute(topLevelRoute.route::class)
                 } == true
 
                 NavigationBarItem(

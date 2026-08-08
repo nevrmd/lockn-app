@@ -1,4 +1,4 @@
-package com.nevrmd.domain.navigation
+package com.nevrmd.navigation
 
 import kotlinx.serialization.Serializable
 

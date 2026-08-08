@@ -13,7 +13,7 @@ import com.nevrmd.domain.util.ErrorMessages
 import com.nevrmd.feature.habit_editor.presentation.event.HabitEditorUiEvent
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorMode
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
-import com.nevrmd.domain.navigation.Route
+import com.nevrmd.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

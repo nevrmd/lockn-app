@@ -10,7 +10,7 @@ import com.nevrmd.domain.usecase.ValidateHabitUseCase
 import com.nevrmd.domain.util.DataResult
 import com.nevrmd.feature.habit_editor.presentation.event.HabitEditorUiEvent
 import com.nevrmd.feature.habit_editor.presentation.state.HabitEditorUiState
-import com.nevrmd.domain.navigation.Route
+import com.nevrmd.navigation.Route
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

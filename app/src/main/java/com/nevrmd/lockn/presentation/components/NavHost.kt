@@ -4,10 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.nevrmd.domain.navigation.Route
 import com.nevrmd.feature.dashboard.presentation.screen.DashboardScreen
 import com.nevrmd.feature.habit_editor.presentation.screen.HabitEditorScreen
 import com.nevrmd.feature.statistics.presentation.screen.StatisticsScreen
+import com.nevrmd.navigation.Route
 
 @Composable
 fun LocknNavHost(
