@@ -2,11 +2,12 @@
 
 [![CI](https://github.com/nevrmd/lockn-app/actions/workflows/ci.yml/badge.svg)](https://github.com/nevrmd/lockn-app/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A habit-tracking app for Android, built with Kotlin and Jetpack Compose. Fairly simple, I used it mostly as an excuse to set up a proper multi-module project (MVI, Hilt, Room) with the kind of module boundaries and test coverage you'd expect from a real team.
 
 ## Video Preview
 
-<img src="docs/screenshots/dashboard.png" alt="Dashboard screen showing the weekly calendar strip and empty state" width="280" />
+https://github.com/user-attachments/assets/48ec3e57-64fc-4bbe-9c8c-84ab39022018
 
 ## Getting Started
 
